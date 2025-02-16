@@ -1,0 +1,5 @@
+nct_id,study_title,study_design,primary_outcome_measures,secondary_outcome_measures,sponsor,conditions,brief_summary,collaborators,sex,age,phases,funder_type,enrollment,zip,time_taken_for_enrollment,city,sponsor_tf
+NCT001,Study Title 1,Design 1,Primary Outcome 1,Secondary Outcome 1,Sponsor 1,Condition 1,Summary 1,Collaborator 1,male,adult,phase1,industry,100,12345,30,City 1,Sponsor TF 1
+NCT002,Study Title 2,Design 2,Primary Outcome 2,Secondary Outcome 2,Sponsor 2,Condition 2,Summary 2,Collaborator 2,female,older_adult,phase2,other_gov,200,23456,45,City 2,Sponsor TF 2
+NCT003,Study Title 3,Design 3,Primary Outcome 3,Secondary Outcome 3,Sponsor 3,Condition 3,Summary 3,Collaborator 3,all,child,phase3,federal,300,34567,60,City 3,Sponsor TF 3
+NCT004,Study Title 4,Design 4,Primary Outcome 4,Secondary Outcome 4,Sponsor 4,Condition 4,Summary 4,Collaborator 4,male,adult,phase4,other,400,45678,90,City 4,Sponsor TF 4
