@@ -18,14 +18,29 @@ from lime.lime_tabular import LimeTabularExplainer
 # Add the desired path to sys.path
 sys.path.append(os.path.join("e:", "dashappnest", "venv", "lib", "site-packages"))
 
-# Verify by printing the updated sys.path
-print(sys.path)
-def get_lime(nct_id):
-    column_dict=joblib.load("E:\Dashappnest\Datasets\column_rename_dict.pkl")
+
+if sys.platform=='linux':
+    ROOT_DIR="/home/research/Documents/NEST/nest-dashapp/Datasets/"
+    COLUMN_DICT_PATH=ROOT_DIR+'column_rename_dict.pkl'
+    TRAIN_DATA_PATH=ROOT_DIR+'train_small_model_input.csv'
+    TEST_DATA_PATH=ROOT_DIR+'test_small_model_input.csv'
+    MODEL_PATH=ROOT_DIR+'xgb_trained.pkl'
+    NEW_TO_OLD_DICT_PATH=ROOT_DIR+'new_to_old_column.pkl'
+
+else:
+    COLUMN_DICT_PATH="E:\Dashappnest\Datasets\column_rename_dict.pkl"
+    TRAIN_DATA_PATH='E:/Dashappnest/Datasets/train_small_model_input.csv'
+    TEST_DATA_PATH='E:/Dashappnest/Datasets/test_small_model_input.csv'
+    MODEL_PATH="E:/Dashappnest/Datasets/xgb_trained.pkl"
+    NEW_TO_OLD_DICT_PATH="E:/Dashappnest/Datasets/new_to_old_column.pkl"
+    
+
+def get_preds_explaination(nct_id):
+    column_dict=joblib.load(COLUMN_DICT_PATH)
     print(column_dict)
     # Load your train and test datasets 
-    train_data = pd.read_csv('E:/Dashappnest/Datasets/train_small_model_input.csv')
-    test_data = pd.read_csv('E:/Dashappnest/Datasets/test_small_model_input.csv')
+    train_data = pd.read_csv(TRAIN_DATA_PATH)
+    test_data = pd.read_csv(TEST_DATA_PATH)
 
     print('Test data:')
     print(test_data.head())
@@ -52,6 +67,7 @@ def get_lime(nct_id):
     train_data=train_data.drop(columns=['zip','time_taken_for_enrollment','nct_id'])
     test_instance = test_data[test_data['nct_id']==nct_id]
     test_instance=test_instance.drop(columns=['nct_id'])
+    print(test_instance)
     print(test_instance.shape)
     test_data=test_data.drop(columns=['nct_id'])
 
@@ -64,7 +80,7 @@ def get_lime(nct_id):
     print("Columns in test_data after renaming:")
     print(test_data.columns)
 
-    model=joblib.load("E:/Dashappnest/Datasets/xgb_trained.pkl")
+    model=joblib.load(MODEL_PATH)
     print(model)
 
 
@@ -75,7 +91,7 @@ def get_lime(nct_id):
 
     train_data_np = train_data.to_numpy() 
 
-    new_to_old_column=joblib.load("E:/Dashappnest/Datasets/new_to_old_column.pkl")
+    new_to_old_column=joblib.load(NEW_TO_OLD_DICT_PATH)
     train_data.rename(columns=new_to_old_column, inplace=True)
 
     # Initialize the LIME explainer
@@ -89,13 +105,20 @@ def get_lime(nct_id):
     )
     print("lime loaded")
     # Explain the prediction for the selected test instance
+    test_instance=test_instance.values.ravel()
+    print(test_instance.shape)
     explanation = explainer.explain_instance(test_instance, model.predict)
     print('explained')
     # Get the explanation as a list of feature contributions
     local_explanation = explanation.as_list()
 
 
-    return local_explanation
+    return local_explanation,predictions[0]
 
 
-
+if __name__=='__main__':
+    explained_dict={}
+    nct_id="NCT05877105"
+    explain,val=get_preds_explaination(nct_id)
+    print(explain)
+    print(val)

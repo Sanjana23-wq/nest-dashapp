@@ -4,12 +4,18 @@ import dash_html_components as html
 import plotly.express as px
 from dash import ctx
 from dash.exceptions import PreventUpdate
+import sys
 
-from data_access.data_management import get_lime
+from data_access.data_management import get_preds_explaination
+from analysis.lime import get_lime_figure
 
-df = pd.read_csv('E:\Dashappnest\Datasets\combined_data_test_show.csv')
+if sys.platform=='linux':
+    DATA_PATH='/home/research/Documents/NEST/nest-dashapp/Datasets/combined_data_test_show.csv'
+else:
+    DATA_PATH='E:\Dashappnest\Datasets\combined_data_test_show.csv'
+
+df = pd.read_csv(DATA_PATH)
 def register_callbacks(app):
-    # Load the dummy CSV file
     global df
     print("CSV Loaded Successfully:")
     print(df)  # Debugging
@@ -80,10 +86,6 @@ def register_callbacks(app):
 
         if not ctx.triggered:
             raise PreventUpdate
-        data = {
-            'Category': ['A', 'B', 'C', 'D'],
-            'Value': [10, 15, 7, 20]
-        }
 
             # Initialize an empty figure (valid structure)
         style={
@@ -95,15 +97,29 @@ def register_callbacks(app):
             'display': None,
         }
 
-        fig = px.bar(data, x='Category', y='Value', title="Feature Weights for LIME Explanation",orientation='h')
         button_id=ctx.triggered[0]['prop_id'].split('.')[0]
 
         if nct_id not in df.nct_id.values:
             return None, style
         if button_id == 'predict-button':
             
-            # Example graphs (replace with your actual graph logic)
-            lime_values=get_lime(nct_id)
-            style['display']='block'
+            lime_values,pred=get_preds_explaination(nct_id)
             print('lime_values',lime_values)
+            features=[]
+            weights=[]
+            for tup in lime_values:
+                vals=tup[0].split(" > ")
+                if len(vals)==1:
+                    vals=vals[0]
+                    vals=vals.split(" <")
+                for v in vals:
+                    v=v.strip()
+                    if v[0].isalpha():
+                        features.append(v)
+                        break
+            
+                weights.append(tup[1])
+            print('features= ',features)
+            fig=get_lime_figure(features,weights)
+            style['display']='block'
         return fig,style

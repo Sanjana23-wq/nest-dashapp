@@ -80,8 +80,8 @@ layout = html.Div([
 
             # Add "OR" text and horizontal line
             html.Div([
-                html.Div("OR", style={'textAlign': 'center', 'fontSize': '14px', 'margin': '10px 0'}),
-                html.Hr(style={'width': '50%', 'margin': 'auto', 'border': '1px solid #ccc'})
+                #html.Div("OR", style={'textAlign': 'center', 'fontSize': '14px', 'margin': '10px 0'}),
+                html.Hr(style={'width': '50%', 'margin': 'auto', 'border': '2px solid #ccc'})
             ]),
 
             # 2x2 Grid Layout for Categories
@@ -109,10 +109,10 @@ layout = html.Div([
                             dcc.Input(id='country', type='text', placeholder="Conditions", value="", style=input_style),
                             # dcc.Input(id='brief_summary', type='text', placeholder="Brief Summary", value="", style=input_style),
                             # dcc.Input(id='collaborators', type='text', placeholder="Collaborators", value="", style=input_style),
-                            dcc.Dropdown(id='sex', options=[{'label': 'Male', 'value': 'male'}, {'label': 'Female', 'value': 'female'}, {'label': 'All', 'value': 'all'}], value='', placeholder="Select Sex", style=dropdown_style),
-                            dcc.Dropdown(id='age', options=[{'label': 'Adult', 'value': 'adult'}, {'label': 'Older Adult', 'value': 'older_adult'}, {'label': 'Child', 'value': 'child'}], value='', placeholder="Select Age Group", style=dropdown_style),
-                            dcc.Dropdown(id='phases', options=[{'label': 'Phase 1', 'value': 'phase1'}, {'label': 'Phase 2', 'value': 'phase2'}, {'label': 'Phase 3', 'value': 'phase3'}, {'label': 'Phase 4', 'value': 'phase4'}], value='', placeholder="Select Phase", style=dropdown_style),
-                            dcc.Dropdown(id='funder_type', options=[{'label': 'Other', 'value': 'other'}, {'label': 'Industry', 'value': 'industry'}, {'label': 'Other Government', 'value': 'other_gov'}, {'label': 'Federal', 'value': 'federal'}], value='', placeholder="Select Funder Type", style=dropdown_style)
+                            dcc.Input(id='sex', type='text', placeholder="Sex", value="", style=input_style),
+                            dcc.Input(id='age', type='text', placeholder="Age", value="", style=input_style),
+                            dcc.Input(id='phases', type='text', placeholder="Phases", value="", style=input_style),
+                            dcc.Input(id='funder_type', type='text', placeholder="Funder type", value="", style=input_style),
                         ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(2, 1fr)', 'gap': '10px', 'marginBottom': '10px'})  # Add gap between grid items
                     ], style={'border': '2px solid yellow', 'padding': '8px', 'margin': '8px', 'flex': 1, 'maxWidth': '40%'}),  # Yellow border
                 ], style={'display': 'flex', 'flexWrap': 'wrap', 'gap': '10px', 'marginTop': '10px', 'justifyContent': 'center'}), 
@@ -120,7 +120,7 @@ layout = html.Div([
                 # Numeric columns
                 html.Div([ 
                     html.Div([ 
-                        html.H4("Numeric Columns", style={'fontSize': '12px', 'marginBottom': '8px', 'color': 'red'}),
+                        html.H4("Numeric Features", style={'fontSize': '12px', 'marginBottom': '8px', 'color': 'red'}),
                         html.Div([ 
                             dcc.Input(id='enrollment', type='text', placeholder="Enrollment", value="", style=input_style),
                         ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(2, 1fr)', 'gap': '10px', 'marginBottom': '10px',})  # Add gap between grid items
