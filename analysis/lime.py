@@ -20,7 +20,7 @@ def get_lime_figure(features,weights):
 
     # Update layout
     fig.update_layout(
-        title='Feature Weights for LIME Explanation',
+        title='Feature Importance Using LIME',
         xaxis_title='Weight',
         yaxis_title='Features',
         xaxis=dict(

@@ -1,7 +1,12 @@
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
+import sys
 
+if sys.platform=='linux':
+    IMAGE_PATH='/home/research/Documents/NEST/nest-dashapp/assets/novartis background image.jpg'
+else:
+    IMAGE_PATH="E:\Dashappnest\assets\novartis background image.jpg"
 # Common style dictionaries
 dropdown_style = {
     'width': '100%',
@@ -16,8 +21,17 @@ input_style = {
     'padding': '6px',  # Reduced padding for a more compact design
     'fontSize': '12px',  # Smaller font size for a more compact design
     'marginBottom': '10px',  # Add space below each input field
-    'color': 'blue'  # Blue text for input fields
+    'color': 'black'  # Black text for input fields
 }
+
+pred_style = {
+    'width': '99%',
+    'padding': '5px',  # Reduced padding for a more compact design
+    'fontSize': '26px',  # Smaller font size for a more compact design
+    'marginBottom': '9px',  # Add space below each input field
+    'color': 'blue'  
+}
+
 
 button_style = {
     'width': '40%',  # Adjusted width for better centering
@@ -35,7 +49,7 @@ button_style = {
 layout = html.Div([
     # Header Section with Title
     html.Div([
-        html.H1("Enrollment Prediction", style={'color': 'blue', 'textAlign': 'center', 'marginBottom': '20px'})
+        html.H1("EnrollPredict AI", style={'color': 'blue', 'textAlign': 'center', 'marginBottom': '20px'})
     ]),
 
     html.Div(id='main-container', children=[
@@ -94,7 +108,7 @@ layout = html.Div([
                             dcc.Input(id='study_design', type='text', placeholder="Study Design", value="", style=input_style),
                             dcc.Input(id='study_title', type='text', placeholder="Study Title", value="", style=input_style),
                             dcc.Input(id='Conditions', type='text', placeholder="Conditions", value="", style=input_style),
-                            dcc.Input(id='brief_summary', type='text', placeholder="breif_summary", value="", style=input_style),
+                            dcc.Input(id='brief_summary', type='text', placeholder="brief_summary", value="", style=input_style),
                             dcc.Input(id='interventions', type='text', placeholder="interventions", value="", style=input_style),
                             dcc.Input(id='primary_outcome_measures', type='text', placeholder="Primary Outcome Measures", value="", style=input_style),
                             dcc.Input(id='secondary_outcome_measures', type='text', placeholder="Secondary Outcome Measures", value="", style=input_style)
@@ -103,7 +117,7 @@ layout = html.Div([
 
                     # Second Box: Categorical Columns
                     html.Div([ 
-                        html.H4("Categorical Columns", style={'fontSize': '12px', 'marginBottom': '8px', 'color': 'red'}),
+                        html.H4("Categorical Features", style={'fontSize': '12px', 'marginBottom': '8px', 'color': 'red'}),
                         html.Div([ 
                             dcc.Input(id='study_result', type='text', placeholder="study_result", value="", style=input_style),
                             dcc.Input(id='country', type='text', placeholder="Conditions", value="", style=input_style),
@@ -120,14 +134,14 @@ layout = html.Div([
                 # Numeric columns
                 html.Div([ 
                     html.Div([ 
-                        html.H4("Numeric Features", style={'fontSize': '12px', 'marginBottom': '8px', 'color': 'red'}),
+                        html.H4("Numerical Features", style={'fontSize': '12px', 'marginBottom': '8px', 'color': 'red'}),
                         html.Div([ 
                             dcc.Input(id='enrollment', type='text', placeholder="Enrollment", value="", style=input_style),
                         ], style={'display': 'grid', 'gridTemplateColumns': 'repeat(2, 1fr)', 'gap': '10px', 'marginBottom': '10px',})  # Add gap between grid items
                     ], style={'border': '1px solid #ccc', 'padding': '8px', 'margin': '8px', 'flex': 1, 'maxWidth': '40%','border': '2px solid yellow'}),
 
                     html.Div([ 
-                        html.H4("TF-IDF Vector", style={'fontSize': '12px', 'marginBottom': '8px', 'color': 'red'}),
+                        html.H4("TF-IDF Features", style={'fontSize': '12px', 'marginBottom': '8px', 'color': 'red'}),
                         html.Div([ 
                             dcc.Input(id='city', type='text', placeholder="City", value="", style=input_style),
                             dcc.Input(id='sponsor_tf', type='text', placeholder="Sponsor", value="", style=input_style)
@@ -138,15 +152,16 @@ layout = html.Div([
 
             # Centered Predict Button and Output
             html.Div([ 
-                html.Button('Predict', id='predict-button', style=button_style)
-            ], style={'display': 'flex', 'justifyContent': 'center', 'margin': '10px 0'}),
+                html.Button('Predict', id='predict-button', style=button_style),
+                html.Label(id='pred-message',children=None, style=pred_style)
+            ], style={'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 'gap': '10px', 'margin': '10px 0'}),
 
             html.Div([ 
                 html.Div(id='result-output', style={'fontSize': '14px', 'padding': '10px', 'textAlign': 'center'}),
                 html.Div(id='error-message', style={'color': 'red', 'fontSize': '14px', 'padding': '10px', 'textAlign': 'center'})
             ], style={'textAlign': 'center', 'marginTop': '20px'})
         ], style={
-            'backgroundImage': 'url("E:\Dashappnest\assets\novartis background image.jpg")',  # Replace with your image URL
+            'backgroundImage': f'url({IMAGE_PATH})',  # Replace with your image URL
             'backgroundSize': 'cover',
             'backgroundPosition': 'center',
             'backgroundRepeat': 'no-repeat',
@@ -157,15 +172,15 @@ layout = html.Div([
 
         # Right Side: Graphs (initially hidden)
         html.Div(id='graph-container', children=[
-            dcc.Graph(id='graph-1'),
         ], style={
             'width': '50%',  # Set width to 50% for the graph container
-            'display': 'none',  # Initially hidden
             'padding': '20px',  # Add padding for better readability
             'borderRadius': '10px',  # Optional: Add rounded corners
             'backgroundColor': '#f9f9f9',
-            'display': None,
-        })
+            'display': 'none',
+            'flexDirection':'column',
+            'alignItems':'center'
+        }),
         ], style={'display': 'flex', 'flexDirection': 'row'})
 ])
 

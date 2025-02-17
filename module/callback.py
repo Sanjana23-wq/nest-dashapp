@@ -1,8 +1,7 @@
 from dash import Input, Output, State
 import pandas as pd
-import dash_html_components as html
 import plotly.express as px
-from dash import ctx
+from dash import ctx,dcc,html
 from dash.exceptions import PreventUpdate
 import sys
 
@@ -32,7 +31,6 @@ def register_callbacks(app):
          Output('study_result', 'value'),
          Output('country', 'value'),
          Output('brief_summary', 'value'),
-        #  Output('collaborators', 'value'),
          Output('sex', 'value'),
          Output('age', 'value'),
          Output('phases', 'value'),
@@ -40,13 +38,22 @@ def register_callbacks(app):
          Output('enrollment', 'value'),
          Output('city', 'value'),
          Output('sponsor_tf', 'value'),
-         Output('error-message', 'children')],
+         Output('error-message', 'children'),
+         Output('graph-container','style',allow_duplicate=True),
+         Output('pred-message','children',allow_duplicate=True)],
         [Input('autofill-button', 'n_clicks')],
         [State('nct_id', 'value')]
     )
     def autofill_fields(n_clicks, nct_id):
         print(f"Autofill button clicked: {n_clicks}")  # Debugging
         print(f"nct_id entered: {nct_id}")  # Debugging
+        style={
+            'width': '50%',  # Set width to 50% for the graph container
+            'display': 'none',  # Initially hidden
+            'padding': '20px',  # Add padding for better readability
+            'borderRadius': '10px',  # Optional: Add rounded corners
+            'backgroundColor': '#f9f9f9',
+        }
 
         if n_clicks:
             # Strip any extra spaces and convert to uppercase for matching
@@ -60,24 +67,26 @@ def register_callbacks(app):
                 row = df[df['nct_id'] == nct_id].iloc[0]
                 print("Row data:")  # Debugging
                 print(row)  # Debugging
+                row=row.replace(float('nan'),'')
                 # Return the values for all fields
                 return (
-                    row['study_title'], row['study_design'], row['primary_outcome_measures'], row['conditions'],
-                    row['secondary_outcome_measures'], row['study_results'], row['interventions'],
-                    row['brief_summary'], row['sex'], row['age'], row['country'],
+                    row['study_title'], row['study_design'], row['conditions'],row['interventions'],
+                    row['primary_outcome_measures'], row['secondary_outcome_measures'], row['study_results'], 
+                    row['country'],row['brief_summary'], row['sex'], row['age'],
                     row['phases'], row['funder_type'], row['enrollment'],
-                    row['city'], row['sponsor'], ""
+                    row['city'], row['sponsor'], "",style,None
                 )
             else:
                 print("nct_id not found in CSV")  # Debugging
                 # If nct_id does not exist, return empty values and show an error message
-                return [""] * 16 + ["Error: NCT ID does not exist."]
+                return [""] * 16 + ["Error: NCT ID does not exist.",style,None]
         # If the button is not clicked, return empty values
-        return [""] * 17
+        return [""] * 17+[style,None]
     
     @app.callback(
-            [Output('graph-1','figure'),
-             Output('graph-container','style')],
+            [Output('graph-container','children'),
+             Output('graph-container','style'),
+             Output('pred-message','children')],
             [Input('predict-button', 'n_clicks')],
             [State('nct_id', 'value')]
     )
@@ -94,7 +103,6 @@ def register_callbacks(app):
             'padding': '20px',  # Add padding for better readability
             'borderRadius': '10px',  # Optional: Add rounded corners
             'backgroundColor': '#f9f9f9',
-            'display': None,
         }
 
         button_id=ctx.triggered[0]['prop_id'].split('.')[0]
@@ -121,5 +129,9 @@ def register_callbacks(app):
                 weights.append(tup[1])
             print('features= ',features)
             fig=get_lime_figure(features,weights)
-            style['display']='block'
-        return fig,style
+            graph= dcc.Graph(id='graph-1')
+            graph.figure=fig
+            style['display']='flex'
+            pred_message=f"Predicted Time taken for enrollement: {pred:.2f} Months"
+            children=[graph]
+        return children,style,pred_message

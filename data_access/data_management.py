@@ -37,27 +37,27 @@ else:
 
 def get_preds_explaination(nct_id):
     column_dict=joblib.load(COLUMN_DICT_PATH)
-    print(column_dict)
+    #print(column_dict)
     # Load your train and test datasets 
     train_data = pd.read_csv(TRAIN_DATA_PATH)
     test_data = pd.read_csv(TEST_DATA_PATH)
 
-    print('Test data:')
-    print(test_data.head())
-    print('Train data:')
-    print(train_data.head())
+    ##print('Test data:')
+    #print(test_data.head())
+    #print('Train data:')
+    #print(train_data.head())
     #rename columns 
     train_data.rename(columns=column_dict, inplace=True)
     test_data.rename(columns=column_dict, inplace=True)
 
-    print("Columns in train_data after renaming:", train_data.columns)
-    print("Columns in test_data after renaming:", test_data.columns)
+    #print("Columns in train_data after renaming:", train_data.columns)
+    #print("Columns in test_data after renaming:", test_data.columns)
 
-    print("Original columns in train_data:")
-    print(train_data.columns)
+    #print("Original columns in train_data:")
+    #print(train_data.columns)
 
-    print("Original columns in test_data:")
-    print(test_data.columns)
+    #print("Original columns in test_data:")
+    #print(test_data.columns)
 
     # Drop columns with all NaN values (optional, only if needed)
     train_data = train_data.dropna(axis=1, how='all')
@@ -67,21 +67,21 @@ def get_preds_explaination(nct_id):
     train_data=train_data.drop(columns=['zip','time_taken_for_enrollment','nct_id'])
     test_instance = test_data[test_data['nct_id']==nct_id]
     test_instance=test_instance.drop(columns=['nct_id'])
-    print(test_instance)
-    print(test_instance.shape)
+    #print(test_instance)
+    #print(test_instance.shape)
     test_data=test_data.drop(columns=['nct_id'])
 
 
 
     # Verify the renamed columns
-    print("Columns in train_data after renaming:")
-    print(train_data.columns)
+    #print("Columns in train_data after renaming:")
+    #print(train_data.columns)
 
-    print("Columns in test_data after renaming:")
-    print(test_data.columns)
+    #print("Columns in test_data after renaming:")
+    #print(test_data.columns)
 
     model=joblib.load(MODEL_PATH)
-    print(model)
+    #print(model)
 
 
     predictions=model.predict(test_instance)
@@ -103,12 +103,12 @@ def get_preds_explaination(nct_id):
         verbose=True,
         random_state=42
     )
-    print("lime loaded")
+    #print("lime loaded")
     # Explain the prediction for the selected test instance
     test_instance=test_instance.values.ravel()
-    print(test_instance.shape)
+    #print(test_instance.shape)
     explanation = explainer.explain_instance(test_instance, model.predict)
-    print('explained')
+    #print('explained')
     # Get the explanation as a list of feature contributions
     local_explanation = explanation.as_list()
 
