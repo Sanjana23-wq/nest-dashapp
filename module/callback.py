@@ -1,22 +1,32 @@
 from dash import Input, Output, State
 import pandas as pd
 import dash_html_components as html
+import plotly.express as px
+from dash import ctx
+from dash.exceptions import PreventUpdate
 
+from data_access.data_management import get_lime
+
+df = pd.read_csv('E:\Dashappnest\Datasets\combined_data_test_show.csv')
 def register_callbacks(app):
     # Load the dummy CSV file
-    df = pd.read_csv('dummy_data.csv')
+    global df
     print("CSV Loaded Successfully:")
     print(df)  # Debugging
 
     @app.callback(
+            
         [Output('study_title', 'value'),
          Output('study_design', 'value'),
+         Output('Conditions', 'value'),
+         Output('interventions', 'value'),
          Output('primary_outcome_measures', 'value'),
          Output('secondary_outcome_measures', 'value'),
-         Output('sponsor', 'value'),
-         Output('conditions', 'value'),
+         
+         Output('study_result', 'value'),
+         Output('country', 'value'),
          Output('brief_summary', 'value'),
-         Output('collaborators', 'value'),
+        #  Output('collaborators', 'value'),
          Output('sex', 'value'),
          Output('age', 'value'),
          Output('phases', 'value'),
@@ -46,60 +56,54 @@ def register_callbacks(app):
                 print(row)  # Debugging
                 # Return the values for all fields
                 return (
-                    row['study_title'], row['study_design'], row['primary_outcome_measures'],
-                    row['secondary_outcome_measures'], row['sponsor'], row['conditions'],
-                    row['brief_summary'], row['collaborators'], row['sex'], row['age'],
+                    row['study_title'], row['study_design'], row['primary_outcome_measures'], row['conditions'],
+                    row['secondary_outcome_measures'], row['study_results'], row['interventions'],
+                    row['brief_summary'], row['sex'], row['age'], row['country'],
                     row['phases'], row['funder_type'], row['enrollment'],
-                    row['city'], row['sponsor_tf'], ""
+                    row['city'], row['sponsor'], ""
                 )
             else:
                 print("nct_id not found in CSV")  # Debugging
                 # If nct_id does not exist, return empty values and show an error message
-                return [""] * 15 + ["Error: NCT ID does not exist."]
+                return [""] * 16 + ["Error: NCT ID does not exist."]
         # If the button is not clicked, return empty values
-        return [""] * 16
-
+        return [""] * 17
+    
     @app.callback(
-        Output('result-output', 'children'),
-        [Input('predict-button', 'n_clicks')],
-        [State('study_title', 'value'),
-         State('study_design', 'value'),
-         State('primary_outcome_measures', 'value'),
-         State('secondary_outcome_measures', 'value'),
-         State('sponsor', 'value'),
-         State('conditions', 'value'),
-         State('brief_summary', 'value'),
-         State('collaborators', 'value'),
-         State('sex', 'value'),
-         State('age', 'value'),
-         State('phases', 'value'),
-         State('funder_type', 'value'),
-         State('enrollment', 'value'),
-         State('city', 'value'),
-         State('sponsor_tf', 'value')]
+            [Output('graph-1','figure'),
+             Output('graph-container','style')],
+            [Input('predict-button', 'n_clicks')],
+            [State('nct_id', 'value')]
     )
+    def update_graphs(n_clicks, nct_id):
+        global df
 
+        if not ctx.triggered:
+            raise PreventUpdate
+        data = {
+            'Category': ['A', 'B', 'C', 'D'],
+            'Value': [10, 15, 7, 20]
+        }
 
-    def display_autofilled_data(n_clicks, study_title, study_design, primary_outcome_measures, secondary_outcome_measures,
-                                sponsor, conditions, brief_summary, collaborators, sex, age, phases, funder_type,
-                                enrollment, city, sponsor_tf):
-        if n_clicks:
-            # Return each field in a separate Div, effectively stacking them vertically
-            return html.Div([
-                html.Div(f"Study Title: {study_title}"),
-                html.Div(f"Study Design: {study_design}"),
-                html.Div(f"Primary Outcome Measures: {primary_outcome_measures}"),
-                html.Div(f"Secondary Outcome Measures: {secondary_outcome_measures}"),
-                html.Div(f"Sponsor: {sponsor}"),
-                html.Div(f"Conditions: {conditions}"),
-                html.Div(f"Brief Summary: {brief_summary}"),
-                html.Div(f"Collaborators: {collaborators}"),
-                html.Div(f"Sex: {sex}"),
-                html.Div(f"Age: {age}"),
-                html.Div(f"Phases: {phases}"),
-                html.Div(f"Funder Type: {funder_type}"),
-                html.Div(f"Enrollment: {enrollment}"),
-                html.Div(f"City: {city}"),
-                html.Div(f"Sponsor TF: {sponsor_tf}")
-            ])
-        return ""
+            # Initialize an empty figure (valid structure)
+        style={
+            'width': '50%',  # Set width to 50% for the graph container
+            'display': 'none',  # Initially hidden
+            'padding': '20px',  # Add padding for better readability
+            'borderRadius': '10px',  # Optional: Add rounded corners
+            'backgroundColor': '#f9f9f9',
+            'display': None,
+        }
+
+        fig = px.bar(data, x='Category', y='Value', title="Feature Weights for LIME Explanation",orientation='h')
+        button_id=ctx.triggered[0]['prop_id'].split('.')[0]
+
+        if nct_id not in df.nct_id.values:
+            return None, style
+        if button_id == 'predict-button':
+            
+            # Example graphs (replace with your actual graph logic)
+            lime_values=get_lime(nct_id)
+            style['display']='block'
+            print('lime_values',lime_values)
+        return fig,style
