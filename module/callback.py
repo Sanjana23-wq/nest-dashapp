@@ -135,3 +135,6 @@ def register_callbacks(app):
             pred_message=f"Predicted Time taken for enrollement: {pred:.2f} Months"
             children=[graph]
         return children,style,pred_message
+    
+
+    

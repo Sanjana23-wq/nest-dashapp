@@ -49,8 +49,18 @@ button_style = {
 layout = html.Div([
     # Header Section with Title
     html.Div([
-        html.H1("EnrollPredict AI", style={'color': 'blue', 'textAlign': 'center', 'marginBottom': '20px'})
-    ]),
+        html.H1("EnrollPredict AI", style={'color': 'blue', 'textAlign': 'center', 'marginBottom': '20px'}),
+        html.Img(
+            src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Novartis-Logo.svg/2560px-Novartis-Logo.svg.png',  # Adjust path based on your setup
+            style={
+                'position': 'absolute',
+                'top': '10px',
+                'left': '0px',
+                'height': '50px'
+            }
+        )
+    ], style={'position': 'relative'}),
+    
 
     html.Div(id='main-container', children=[
         # Left Side: Input Fields
